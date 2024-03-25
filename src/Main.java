@@ -1,6 +1,10 @@
-public class Main {
-    public static void main(String[] args) {
+import java.sql.Time;
+import java.util.Date;
+
+public class Main  {
+    public static void main(String[] args) throws InterruptedException {
         Fraction fr= new Fraction(2,3);
+        Date d1, d2;
         Fractionable num = Utils.cache(fr);
         num.doubleValue();// sout сработал
         num.doubleValue();// sout молчит

@@ -2,41 +2,54 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class InvokeHandler implements InvocationHandler {
     private Object obj;
     private boolean isMutated;      //Значимые поля были изменены
     private Object retCachedObj;         // Возвращаемое кэшированное значение
 
-    private HashMap<String, HashMap<String, Object>> cachedObjects;   //Список сохраненных состояний объекта
-    private HashMap<String, Object> cachedValues;   //Список сохраненных значений. Метод - значение
+    private State objState;
 
-    private HashMap<String, Object> temp = new HashMap<>();
+    private HashMap<State, HashMap<String, Object>> cachedObjects;   //Список сохраненных состояний объекта
+    private HashMap<String, Object> cachedValues;   //Список сохраненных значений. Метод - значение
 
     InvokeHandler(Object obj) {
         this.obj = obj;
         this.isMutated = true;
         this.cachedObjects = new HashMap<>();
     }
+    //TODO убрать то что ниже
+    //Получаем условное состояние объекта на основе параметров
+//    private String getState() throws IllegalAccessException {
+//        String retStr = "";
+//        for (Field f : obj.getClass().getDeclaredFields()) {
+//            f.setAccessible(true);
+//            retStr += "#" + f.getName() + "#" + f.get(obj).toString();
+//        }
+//        return retStr;
+//    }
+        private State getState() throws IllegalAccessException {
 
-    //Получаем условное состояние объекта в виде строки, чтобы не путаться в многоуровневых HashMap
-    private String getState() throws IllegalAccessException {
-        String retStr = "";
+        HashMap<String, Object> list = new HashMap<>();
+
         for (Field f : obj.getClass().getDeclaredFields()) {
             f.setAccessible(true);
-            retStr += "#" + f.getName() + "#" + f.get(obj).toString();
+            list.put(f.getName(), f.get(obj));
         }
-        return retStr;
+        return new State(list);
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //Входящий method не брать! Он от интерфейса и аннотаций там нет.
         Method myMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes());
-        String objState = getState();
-        //TODO заменить getname на сохраненное имя метода
+
+        if (isMutated)  {objState = getState();
+        System.out.println(objState);}
 
         //Проход по аннотациям. Отбираем те что нас интересуют, вдруг их там много разных
         for (Annotation a : Arrays.stream(myMethod.getDeclaredAnnotations()).filter(x -> x.annotationType().equals(Mutator.class) || x.annotationType().equals(Cache.class)).toList()) {
