@@ -16,9 +16,10 @@ public class Main  {
         num.setNum(2);
         System.out.println("set 2");
         num.doubleValue();// sout молчит
+        Thread.sleep(2000);             //Чтобы всё просрочилось
         num.doubleValue();// sout молчит
-        num.setNum(1);
-        System.out.println("set 1");
+        Thread.sleep(500);             //Чтобы дать время запуститься потоку
         num.doubleValue();// sout сработал
+
     }
 }

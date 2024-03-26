@@ -18,7 +18,7 @@ public class Fraction implements Fractionable{
     }
 
     @Override
-    @Cache(lifecycle=500)
+    @Cache(lifecycle=1000)
     public double doubleValue() {
         System.out.println("invoke double value");
         return (double) num/denum;
