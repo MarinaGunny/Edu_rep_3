@@ -20,6 +20,7 @@ public class Main  {
         num.doubleValue();// sout молчит
         Thread.sleep(500);             //Чтобы дать время запуститься потоку
         num.doubleValue();// sout сработал
+//        System.out.println(90%50);
 
     }
 }
